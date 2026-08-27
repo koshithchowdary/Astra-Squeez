@@ -1,16 +1,27 @@
 # AstraSqueeze ⚡
 
-A multi-timeframe squeeze and trend intelligence MVP inspired by the trading workflow in the supplied screenshot.
+A multi-timeframe squeeze and trend research platform inspired by the trading workflow in the supplied screenshot.
 
-## Features
-- 15m / 1h / 4h / 1D market context
-- EMA trend alignment
-- RSI confirmation
+## Phase 2 features
+- Real OHLC market data through Yahoo Finance / `yfinance`
+- Demo-data fallback for safe UI testing
+- 5m, 15m, 1h and 1d analysis options
+- 15m / 1h / 4h / 1D market context model
+- EMA trend alignment and RSI confirmation
 - Volatility squeeze detection
 - BUY SQUEEZE / SELL SQUEEZE / WAIT states
-- ATR-based stop loss and TP1–TP4
-- Interactive Streamlit dashboard
-- Safe generated data demo mode
+- ATR-based stop and target framework
+- Historical signal backtesting
+- Configurable starting capital, fees, slippage and reward:risk
+- Win rate, net P&L, return, maximum drawdown and profit factor
+- Equity curve and downloadable trade history CSV
+- No real-order execution
+
+## Example tickers
+- `GC=F` — Gold futures
+- `BTC-USD` — Bitcoin
+- `ETH-USD` — Ethereum
+- `EURUSD=X` — EUR/USD
 
 ## Run locally
 ```bash
@@ -18,12 +29,14 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-## Roadmap
-1. Historical/live market data adapters
-2. Configurable indicators and proper ADX
-3. Backtesting with fees and slippage
-4. Paper trading
-5. Alerts
-6. Broker/exchange integration behind an explicit execution toggle
+## Important research notes
+The current backtester is intentionally simple: one position at a time, next-bar entry, ATR stop and fixed R-multiple target. It is a research tool, not evidence that the strategy is profitable. Historical results can change materially with the data source, interval, fees, slippage and execution assumptions.
 
-> Not financial advice. No live trading is enabled in this MVP.
+## Roadmap
+1. Strategy validation and full ADX / multi-timeframe resampling
+2. Paper portfolio with persistent positions and trade journal
+3. Walk-forward testing and parameter optimization safeguards
+4. Alerts
+5. Optional broker/exchange adapters behind explicit user-controlled execution settings
+
+> Not financial advice. Real trading remains disabled.
