@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from dataclasses import replace
 
-from .domain import OrderIntent
 from .gateways import ExecutionGateway, MarketDataGateway
 from .risk import KillSwitch, RiskManager
 from .strategy import StructuralRetestStrategy
@@ -38,7 +38,7 @@ class TradingEngine:
                     if decision.reason in {"daily_loss_limit", "weekly_loss_limit", "risk_lock"}:
                         await self.kill_switch.trigger(decision.reason)
                     continue
-                final_intent = OrderIntent(**{**intent.__dict__, "quantity": decision.quantity})
+                final_intent = replace(intent, quantity=decision.quantity)
                 order_id = await self.execution.submit(final_intent)
                 log.info("order submitted id=%s", order_id)
             except asyncio.CancelledError:
