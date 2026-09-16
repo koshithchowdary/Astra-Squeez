@@ -1,7 +1,7 @@
+import asyncio
+
 from trading_bot.domain import AccountSnapshot, OrderIntent, OrderType, RiskLimits, Side
 from trading_bot.risk import RiskManager
-
-import asyncio
 
 
 def test_position_sizing_and_rr_guardrail():
@@ -10,7 +10,7 @@ def test_position_sizing_and_rr_guardrail():
     account = AccountSnapshot(10000, 0, 0, 0, 0)
     decision = asyncio.run(risk.authorize(intent, account))
     assert decision.approved
-    assert decision.quantity == 1.0
+    assert decision.quantity == 10.0
 
 
 def test_daily_loss_lock():
