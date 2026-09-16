@@ -1,42 +1,55 @@
-# AstraSqueeze ⚡
+# Astra-Squeez — Event-Driven Structural Retest Engine
 
-A multi-timeframe squeeze and trend research platform inspired by the trading workflow in the supplied screenshot.
+A modular Python algorithmic-trading engine implementing the Structural Break & Confluence Retest specification.
 
-## Phase 2 features
-- Real OHLC market data through Yahoo Finance / `yfinance`
-- Demo-data fallback for safe UI testing
-- 5m, 15m, 1h and 1d analysis options
-- 15m / 1h / 4h / 1D market context model
-- EMA trend alignment and RSI confirmation
-- Volatility squeeze detection
-- BUY SQUEEZE / SELL SQUEEZE / WAIT states
-- ATR-based stop and target framework
-- Historical signal backtesting
-- Configurable starting capital, fees, slippage and reward:risk
-- Win rate, net P&L, return, maximum drawdown and profit factor
-- Equity curve and downloadable trade history CSV
-- No real-order execution
+## Architecture
+- **Market data ingestion:** broker/exchange-neutral OHLCV and order-book models.
+- **Strategy engine:** HH/HL/LH/LL swing structure, bearish Market Structure Shift (MSS), fixed-range Volume Profile/POC, asynchronous 15-minute verification, and clean retest rejection.
+- **Execution layer:** broker-agnostic order gateway with an async CCXT implementation boundary and explicit IBKR/Dhan integration boundaries.
+- **Risk engine:** equity-based position sizing from exact entry/stop distance, structural stop-loss, minimum 2.5R target, and daily/weekly loss locks.
+- **Kill switch:** cancels working limits, closes open positions, and locks trading after configured daily/weekly loss limits.
+- **API:** FastAPI lifecycle and health endpoints.
+- **Operations:** structured lifecycle logging throughout ingestion, signal generation, risk approval, execution, and shutdown.
 
-## Example tickers
-- `GC=F` — Gold futures
-- `BTC-USD` — Bitcoin
-- `ETH-USD` — Ethereum
-- `EURUSD=X` — EUR/USD
+## Supported integration boundaries
+- Crypto: CCXT async REST/WebSocket-compatible gateway boundary.
+- Equities/Futures: Interactive Brokers gateway boundary.
+- Local brokerage: Dhan REST/WebSocket gateway boundary.
 
-## Run locally
+External feeds are normalized into the same internal domain models so strategy and risk logic remain independent of the broker.
+
+## Safety defaults
+Execution is **PAPER mode by default**. Live execution must be explicitly configured through a real broker gateway and should not be enabled until broker-specific order semantics, quantity/price rounding, reconnect handling, reconciliation, persistence, and restart recovery are validated.
+
+## Run
+
 ```bash
 pip install -r requirements.txt
-streamlit run app.py
+uvicorn trading_bot.api:app --host 0.0.0.0 --port 8000
 ```
 
-## Important research notes
-The current backtester is intentionally simple: one position at a time, next-bar entry, ATR stop and fixed R-multiple target. It is a research tool, not evidence that the strategy is profitable. Historical results can change materially with the data source, interval, fees, slippage and execution assumptions.
+Run tests with:
 
-## Roadmap
-1. Strategy validation and full ADX / multi-timeframe resampling
-2. Paper portfolio with persistent positions and trade journal
-3. Walk-forward testing and parameter optimization safeguards
-4. Alerts
-5. Optional broker/exchange adapters behind explicit user-controlled execution settings
+```bash
+pytest
+```
 
-> Not financial advice. Real trading remains disabled.
+## Project structure
+
+```text
+trading_bot/
+├── api.py        # FastAPI application
+├── domain.py     # normalized market/order/account models
+├── engine.py     # event-driven orchestration
+├── gateways.py   # market-data and execution boundaries
+├── risk.py       # sizing and daily/weekly loss controls
+├── strategy.py   # structural MSS + volume-profile retest strategy
+└── __init__.py
+
+tests/
+└── test_risk.py
+
+requirements.txt
+```
+
+This repository intentionally contains only the new event-driven trading engine and its tests; the previous squeeze/backtesting/Streamlit application has been removed.
